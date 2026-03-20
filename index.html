@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Buda · 禅房</title>
+<meta name="description" content="A digital zen room for mindfulness practice — 觉察·转念·布施">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2280%22 font-size=%2280%22>🪷</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --void: #0a0a0c;
+  --void-deep: #050507;
+  --mist: #1a1a1f;
+  --mist-light: #2a2a32;
+  --incense: #c9a84c;
+  --incense-dim: rgba(201, 168, 76, 0.3);
+  --incense-glow: rgba(201, 168, 76, 0.08);
+  --lotus-gold: #b8976a;
+  --smoke: rgba(255, 255, 255, 0.06);
+  --smoke-text: rgba(255, 255, 255, 0.55);
+  --smoke-faint: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --font-cn: 'Noto Serif SC', 'LXGW WenKai', serif;
+  --font-en: 'Cormorant Garamond', 'Georgia', serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--void);
+  color: var(--smoke-text);
+  font-family: var(--font-cn);
+}
+
+/* === BACKGROUND ATMOSPHERE === */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 40%, rgba(201, 168, 76, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 30% 60%, rgba(100, 100, 120, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 70% 30%, rgba(80, 80, 100, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Mist particles */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 200%; height: 200%;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.015), transparent),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.01), transparent),
+    radial-gradient(1px 1px at 50% 40%, rgba(255,255,255,0.012), transparent),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.008), transparent),
+    radial-gradient(1px 1px at 90% 10%, rgba(255,255,255,0.01), transparent);
+  animation: mistDrift 60s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes mistDrift {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-50%, -25%); }
+}
+
+/* === MAIN LAYOUT === */
+#zen-room {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  opacity: 0;
+  animation: roomFadeIn 3s ease-out 0.5s forwards;
+}
+
+@keyframes roomFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* === BUDDHA VISUAL === */
+#buddha-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: -2vh;
+  margin-bottom: 1.5vh;
+}
+
+#buddha-svg {
+  width: clamp(100px, 18vmin, 180px);
+  height: auto;
+  animation: buddhaBreathing 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(201, 168, 76, 0.08));
+}
+
+@keyframes buddhaBreathing {
+  0%, 100% { opacity: 0.3; transform: scale(1); filter: drop-shadow(0 0 30px rgba(201, 168, 76, 0.06)); }
+  50% { opacity: 0.6; transform: scale(1.02); filter: drop-shadow(0 0 50px rgba(201, 168, 76, 0.12)); }
+}
+
+/* Incense smoke wisps */
+.incense-wisp {
+  position: absolute;
+  bottom: 10%;
+  width: 2px;
+  height: 60px;
+  opacity: 0;
+  animation: wisps 8s ease-in-out infinite;
+}
+
+.incense-wisp::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to top, var(--incense-dim), transparent);
+  filter: blur(2px);
+}
+
+.incense-wisp:nth-child(2) { left: 48%; animation-delay: 2s; }
+.incense-wisp:nth-child(3) { left: 52%; animation-delay: 4s; }
+
+@keyframes wisps {
+  0% { opacity: 0; transform: translateY(0) scaleY(0.5); }
+  30% { opacity: 0.4; }
+  70% { opacity: 0.2; }
+  100% { opacity: 0; transform: translateY(-40px) scaleY(1.2) translateX(5px); }
+}
+
+/* Title under Buddha */
+#zen-title {
+  font-family: var(--font-cn);
+  font-size: clamp(0.7rem, 1.5vmin, 0.9rem);
+  font-weight: 300;
+  letter-spacing: 0.5em;
+  color: rgba(255, 255, 255, 0.2);
+  margin-top: 1vh;
+  text-align: center;
+  animation: titleFade 4s ease-out 2s forwards;
+  opacity: 0;
+}
+
+@keyframes titleFade {
+  0% { opacity: 0; letter-spacing: 1em; }
+  100% { opacity: 1; letter-spacing: 0.5em; }
+}
+
+/* === CAROUSEL === */
+#carousel-area {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 2vh 0;
+  flex-shrink: 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+#carousel-track {
+  display: flex;
+  gap: clamp(16px, 3vw, 32px);
+  animation: carouselDrift var(--drift-duration, 40s) linear infinite;
+  width: max-content;
+  padding: 1vh 0;
+}
+
+#carousel-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes carouselDrift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* === CARDS === */
+.zen-card {
+  flex-shrink: 0;
+  width: clamp(220px, 28vw, 320px);
+  padding: clamp(20px, 3vw, 32px);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+.zen-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.zen-card.visible {
+  animation: cardFloat var(--float-duration, 6s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+.zen-card:hover {
+  border-color: var(--incense-dim);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(calc(var(--float-range, -6px))); }
+}
+
+.card-content {
+  font-family: var(--font-cn);
+  font-size: clamp(0.85rem, 1.8vmin, 1.05rem);
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, var(--card-opacity, 0.6));
+  min-height: 3em;
+  display: flex;
+  align-items: center;
+}
+
+.card-content.en {
+  font-family: var(--font-en);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.9rem, 1.9vmin, 1.1rem);
+  line-height: 1.7;
+}
+
+.card-source {
+  margin-top: 12px;
+  font-family: var(--font-en);
+  font-size: clamp(0.65rem, 1.2vmin, 0.8rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--incense-dim);
+  text-align: right;
+}
+
+/* Card variations */
+.zen-card.variant-a { --card-opacity: 0.55; --float-range: -4px; }
+.zen-card.variant-b { --card-opacity: 0.7; --float-range: -8px; }
+.zen-card.variant-c { --card-opacity: 0.5; --float-range: -5px; }
+.zen-card.variant-d { --card-opacity: 0.65; --float-range: -7px; }
+
+.zen-card.size-sm { width: clamp(180px, 22vw, 260px); padding: clamp(16px, 2.5vw, 24px); }
+.zen-card.size-lg { width: clamp(260px, 32vw, 380px); padding: clamp(24px, 3.5vw, 36px); }
+
+/* Staggered entrance */
+.zen-card {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+  transition-delay: var(--entrance-delay, 0s);
+}
+
+.zen-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === CONTROLS (bottom) === */
+#controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(12px, 3vw, 24px);
+  padding: clamp(12px, 2vh, 20px) clamp(16px, 4vw, 32px);
+  background: linear-gradient(to top, rgba(10, 10, 12, 0.9) 0%, transparent 100%);
+  z-index: 10;
+  opacity: 0;
+  animation: controlsFade 2s ease-out 3.5s forwards;
+}
+
+@keyframes controlsFade {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Toggle switch */
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-label {
+  font-family: var(--font-cn);
+  font-size: clamp(0.65rem, 1.3vmin, 0.8rem);
+  font-weight: 300;
+  color: var(--smoke-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--mist);
+  border: 1px solid var(--glass-border);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  flex-shrink: 0;
+}
+
+.toggle-switch.active {
+  background: var(--incense-dim);
+  border-color: var(--incense);
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  transition: transform 0.4s ease;
+}
+
+.toggle-switch.active::after {
+  transform: translateX(18px);
+  background: var(--incense);
+}
+
+/* Interval selector */
+.interval-selector {
+  display: flex;
+  gap: 4px;
+  opacity: 0.4;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.interval-selector.enabled {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.interval-btn {
+  font-family: var(--font-en);
+  font-size: clamp(0.6rem, 1.1vmin, 0.75rem);
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--smoke-text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.interval-btn:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.interval-btn.active {
+  background: var(--incense-glow);
+  border-color: var(--incense-dim);
+  color: var(--incense);
+}
+
+/* Settings gear */
+#settings-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--smoke-text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+#settings-btn:hover {
+  border-color: var(--incense-dim);
+  color: var(--incense);
+}
+
+/* === SETTINGS MODAL === */
+#settings-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(5, 5, 7, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+#settings-overlay.visible {
+  display: flex;
+  opacity: 1;
+}
+
+#settings-modal {
+  width: min(420px, 90vw);
+  background: rgba(20, 20, 25, 0.95);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: clamp(24px, 4vw, 36px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transform: translateY(20px);
+  transition: transform 0.4s ease;
+}
+
+#settings-overlay.visible #settings-modal {
+  transform: translateY(0);
+}
+
+.modal-title {
+  font-family: var(--font-cn);
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 24px;
+  letter-spacing: 0.15em;
+}
+
+.setting-group {
+  margin-bottom: 20px;
+}
+
+.setting-label {
+  font-family: var(--font-cn);
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--smoke-text);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.setting-notice {
+  font-family: var(--font-en);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.25);
+  font-style: italic;
+  margin-top: 6px;
+}
+
+#api-key-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--smoke-faint);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-en);
+  font-size: 0.8rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+#api-key-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+#api-key-input:focus {
+  border-color: var(--incense-dim);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 10px;
+  font-family: var(--font-cn);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--smoke-text);
+}
+
+.modal-btn.primary {
+  background: var(--incense-glow);
+  border-color: var(--incense-dim);
+  color: var(--incense);
+}
+
+.modal-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-btn.primary:hover {
+  background: rgba(201, 168, 76, 0.15);
+}
+
+/* Status indicator */
+#llm-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.7rem;
+  color: var(--smoke-text);
+  font-family: var(--font-en);
+}
+
+#llm-status .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#llm-status.connected .dot {
+  background: #5a8a5a;
+  box-shadow: 0 0 6px rgba(90, 138, 90, 0.4);
+}
+
+/* Notification toast */
+#notification-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: rgba(20, 20, 25, 0.95);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 16px 24px;
+  max-width: min(400px, 85vw);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 200;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-cn);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+#notification-toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  #buddha-svg {
+    width: clamp(80px, 25vmin, 130px);
+  }
+
+  .zen-card {
+    width: clamp(180px, 65vw, 280px) !important;
+    padding: 18px !important;
+  }
+
+  .zen-card.size-sm { width: clamp(160px, 55vw, 240px) !important; }
+  .zen-card.size-lg { width: clamp(200px, 70vw, 300px) !important; }
+
+  #controls {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 16px;
+  }
+
+  .interval-btn {
+    padding: 3px 8px;
+    font-size: 0.6rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .zen-card {
+    width: clamp(280px, 20vw, 360px);
+  }
+}
+
+/* Smooth show/hide for overlay */
+#settings-overlay {
+  display: flex;
+  visibility: hidden;
+  opacity: 0;
+}
+
+#settings-overlay.visible {
+  visibility: visible;
+  opacity: 1;
+}
+</style>
+</head>
+<body>
+
+<div id="zen-room">
+  <!-- BUDDHA VISUAL -->
+  <div id="buddha-container">
+    <div class="incense-wisp"></div>
+    <div class="incense-wisp"></div>
+    <div class="incense-wisp"></div>
+    <svg id="buddha-svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="aura" cx="50%" cy="45%" r="50%">
+          <stop offset="0%" stop-color="rgba(201,168,76,0.15)"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <linearGradient id="bodyGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+          <stop offset="0%" stop-color="rgba(201,168,76,0.25)"/>
+          <stop offset="50%" stop-color="rgba(180,160,100,0.15)"/>
+          <stop offset="100%" stop-color="rgba(160,140,80,0.05)"/>
+        </linearGradient>
+        <filter id="softGlow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <!-- Aura circle -->
+      <circle cx="100" cy="100" r="90" fill="url(#aura)" opacity="0.5"/>
+      <!-- Head -->
+      <ellipse cx="100" cy="68" rx="32" ry="38" fill="url(#bodyGrad)" filter="url(#softGlow)"/>
+      <!-- Ushnisha (top knot) -->
+      <ellipse cx="100" cy="33" rx="16" ry="14" fill="rgba(201,168,76,0.12)"/>
+      <!-- Ears -->
+      <ellipse cx="66" cy="72" rx="6" ry="14" fill="rgba(201,168,76,0.1)"/>
+      <ellipse cx="134" cy="72" rx="6" ry="14" fill="rgba(201,168,76,0.1)"/>
+      <!-- Eyes (closed, meditative) -->
+      <path d="M 82 65 Q 88 62 94 65" stroke="rgba(201,168,76,0.3)" stroke-width="1" fill="none"/>
+      <path d="M 106 65 Q 112 62 118 65" stroke="rgba(201,168,76,0.3)" stroke-width="1" fill="none"/>
+      <!-- Slight smile -->
+      <path d="M 90 80 Q 100 86 110 80" stroke="rgba(201,168,76,0.15)" stroke-width="0.8" fill="none"/>
+      <!-- Neck -->
+      <rect x="90" y="104" width="20" height="12" rx="4" fill="rgba(201,168,76,0.1)"/>
+      <!-- Body (meditation pose) -->
+      <path d="M 55 200 Q 55 130 80 118 Q 100 110 120 118 Q 145 130 145 200 Z"
+            fill="url(#bodyGrad)" filter="url(#softGlow)"/>
+      <!-- Crossed legs -->
+      <ellipse cx="100" cy="210" rx="55" ry="20" fill="rgba(201,168,76,0.08)"/>
+      <!-- Hands (dhyana mudra) -->
+      <ellipse cx="100" cy="180" rx="22" ry="12" fill="rgba(201,168,76,0.1)"/>
+      <!-- Lotus base -->
+      <path d="M 40 230 Q 60 220 100 218 Q 140 220 160 230 Q 140 240 100 242 Q 60 240 40 230 Z"
+            fill="rgba(201,168,76,0.06)"/>
+      <!-- Lotus petals (subtle) -->
+      <path d="M 50 232 Q 65 222 80 232" stroke="rgba(201,168,76,0.08)" stroke-width="0.5" fill="none"/>
+      <path d="M 75 232 Q 90 222 105 232" stroke="rgba(201,168,76,0.08)" stroke-width="0.5" fill="none"/>
+      <path d="M 100 232 Q 115 222 130 232" stroke="rgba(201,168,76,0.08)" stroke-width="0.5" fill="none"/>
+      <path d="M 125 232 Q 140 222 155 232" stroke="rgba(201,168,76,0.08)" stroke-width="0.5" fill="none"/>
+    </svg>
+    <div id="zen-title">觉 察 · 转 念 · 布 施</div>
+  </div>
+
+  <!-- CAROUSEL -->
+  <div id="carousel-area">
+    <div id="carousel-track"></div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div id="controls">
+  <div class="toggle-group">
+    <span class="toggle-label">开启提醒</span>
+    <div class="toggle-switch" id="reminder-toggle" role="switch" aria-checked="false" tabindex="0"></div>
+  </div>
+  <div class="interval-selector" id="interval-selector">
+    <button class="interval-btn" data-minutes="15">15m</button>
+    <button class="interval-btn active" data-minutes="30">30m</button>
+    <button class="interval-btn" data-minutes="45">45m</button>
+    <button class="interval-btn" data-minutes="60">60m</button>
+  </div>
+  <button id="settings-btn" title="设置" aria-label="Settings">⚙</button>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settings-overlay">
+  <div id="settings-modal">
+    <div class="modal-title">设 置</div>
+    <div class="setting-group">
+      <label class="setting-label">Anthropic API Key（可选）</label>
+      <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
+      <div class="setting-notice">Your API key is stored locally in your browser only.</div>
+      <div id="llm-status">
+        <span class="dot"></span>
+        <span id="llm-status-text">未连接</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" id="modal-cancel">取消</button>
+      <button class="modal-btn" id="modal-clear">清除密钥</button>
+      <button class="modal-btn primary" id="modal-save">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION TOAST (in-app fallback) -->
+<div id="notification-toast"></div>
+
+<script>
+// ============================================================
+// BUDA · 禅房 — Core Logic
+// ============================================================
+
+// === CARD DATA ===
+const cards = [
+  { content: '色即是空，空即是色', source: '— 心经' },
+  { content: '应无所住而生其心', source: '— 金刚经' },
+  { content: 'Observe your thoughts like clouds passing', source: '' },
+  { content: '呼吸，觉察，放下', source: '' },
+  { content: 'What you resist, persists.\nWhat you observe, dissolves.', source: '' },
+  { content: '此刻，你在想什么？', source: '' },
+  { content: '一切有为法，如梦幻泡影', source: '— 金刚经' },
+];
+
+// === CURATED PROMPTS POOL (30+) ===
+const prompts = [
+  '🧘 觉察时刻\n此刻，你的肩膀放松了吗？\n💡 轻轻放下双肩\n_身体是最诚实的修行者_',
+  '🧘 觉察时刻\n你正在执着什么念头？\n💡 看见它，不评判\n_念起即觉，觉即不随_',
+  '🧘 觉察时刻\n深呼吸三次，感受气息流过鼻尖\n💡 回到呼吸就是回到当下\n_一呼一吸，皆是修行_',
+  '🧘 觉察时刻\n你的双手此刻在做什么？\n💡 感受手掌的温度\n_触即觉，觉即在_',
+  '🧘 觉察时刻\n闭上眼睛五秒钟\n💡 黑暗中什么都不做\n_无为，本身就是一种布施_',
+  '🧘 觉察时刻\n此刻的情绪是什么颜色？\n💡 不需要改变它，只是看见\n_色即是空_',
+  '🧘 觉察时刻\n你上一次微笑是什么时候？\n💡 现在试试\n_微笑是最简单的布施_',
+  '🧘 觉察时刻\n听——周围有什么声音？\n💡 让声音穿过你\n_万籁皆禅_',
+  '🧘 觉察时刻\n你正在赶路还是在走路？\n💡 慢下来，感受脚底触地\n_步步皆莲花_',
+  '🧘 觉察时刻\n放下手机一分钟\n💡 什么都不做，只是存在\n_应无所住而生其心_',
+  '🧘 觉察时刻\n你今天对自己说了什么话？\n💡 温柔一点\n_自觉觉他，自利利他_',
+  '🧘 觉察时刻\n身体哪里有紧张感？\n💡 把呼吸送到那里\n_身心不二_',
+  '🧘 觉察时刻\n你在等待什么？\n💡 此刻已经完整\n_当下即是圆满_',
+  '🧘 觉察时刻\n想象你的念头是水面的涟漪\n💡 不推不拒，让它自然散去\n_心如止水_',
+  '🧘 觉察时刻\n看看窗外，注意一个细节\n💡 世界一直在那里，只是我们忘了看\n_一花一世界_',
+  '🧘 觉察时刻\n你抓着什么不愿放手？\n💡 紧握的手什么也接不住\n_放下，即得自在_',
+  '🧘 觉察时刻\n感受自己的心跳\n💡 这是生命本身在跟你说话\n_即心即佛_',
+  '🧘 觉察时刻\n你可以选择不回应那个想法\n💡 念头不是你，你是觉知\n_知幻即离_',
+  '🧘 觉察时刻\n如果烦恼是客人，你会怎么招待？\n💡 泡杯茶，然后送它离开\n_烦恼即菩提_',
+  '🧘 觉察时刻\n此刻最需要善待的人是谁？\n💡 也许就是你自己\n_布施从自己开始_',
+  '🧘 觉察时刻\n你的呼吸，快还是慢？\n💡 不需要改变，只是观察\n_如实观照_',
+  '🧘 觉察时刻\n试着感谢一个此刻存在的事物\n💡 感恩本身就是觉察\n_知恩即觉_',
+  '🧘 觉察时刻\n那个让你不安的想法，真的是事实吗？\n💡 念头不等于现实\n_凡所有相，皆是虚妄_',
+  '🧘 觉察时刻\n轻轻转动脖子，感受身体\n💡 回到身体就是回到此刻\n_身在，心在_',
+  '🧘 觉察时刻\n你今天布施了什么？\n💡 一个微笑、一句好话、一刻耐心\n_布施不在大小_',
+  '🧘 觉察时刻\n如果这是你今天最后一个小时\n💡 你会做什么？\n_活在当下_',
+  '🧘 觉察时刻\n把注意力放在双脚\n💡 感受与大地的连接\n_脚踏实地即是修行_',
+  '🧘 觉察时刻\n这一刻，不需要成为任何人\n💡 你已经足够\n_本自具足_',
+  '🧘 觉察时刻\n你在用力思考吗？\n💡 让大脑休息，像放下一个重物\n_无念为宗_',
+  '🧘 觉察时刻\n天空没有因为云而消失\n💡 你的本性也没有因为烦恼而改变\n_自性清净_',
+  '🧘 觉察时刻\n此刻有什么可以感恩的？\n💡 列举三件小事\n_感恩即觉醒_',
+  '🧘 觉察时刻\n转念：把"我必须"换成"我选择"\n💡 自由从语言开始\n_转念即转境_',
+];
+
+// === CAROUSEL SETUP ===
+function initCarousel() {
+  const track = document.getElementById('carousel-track');
+  const variants = ['variant-a', 'variant-b', 'variant-c', 'variant-d'];
+  const sizes = ['', '', 'size-sm', '', 'size-lg', '', 'size-sm'];
+
+  // Duplicate cards for seamless loop
+  const allCards = [...cards, ...cards];
+
+  allCards.forEach((card, i) => {
+    const el = document.createElement('div');
+    const origIndex = i % cards.length;
+    el.className = `zen-card ${variants[origIndex % variants.length]} ${sizes[origIndex] || ''}`.trim();
+    el.style.setProperty('--float-duration', (5 + Math.random() * 4) + 's');
+    el.style.setProperty('--float-delay', (Math.random() * -6) + 's');
+    el.style.setProperty('--entrance-delay', (1.5 + i * 0.15) + 's');
+
+    const contentText = card.content.replace(/\n/g, '<br>');
+    const isEn = /^[A-Z]/.test(card.content);
+    el.innerHTML = `
+      <div class="card-content${isEn ? ' en' : ''}">${contentText}</div>
+      ${card.source ? `<div class="card-source">${card.source}</div>` : ''}
+    `;
+    track.appendChild(el);
+  });
+
+  // Set drift speed — meditative pace
+  const totalCards = allCards.length;
+  track.style.setProperty('--drift-duration', (totalCards * 6) + 's');
+
+  // Trigger staggered entrance
+  requestAnimationFrame(() => {
+    track.querySelectorAll('.zen-card').forEach(card => card.classList.add('visible'));
+  });
+}
+
+// === FLOATING PARTICLES (subtle bokeh) ===
+function initParticles() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'particles';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.4;';
+  document.body.prepend(canvas);
+
+  const ctx = canvas.getContext('2d');
+  let w, h;
+  const particles = [];
+  const COUNT = 15;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < COUNT; i++) {
+    particles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: 1 + Math.random() * 2.5,
+      dx: (Math.random() - 0.5) * 0.15,
+      dy: (Math.random() - 0.5) * 0.1 - 0.05,
+      opacity: 0.03 + Math.random() * 0.06,
+      phase: Math.random() * Math.PI * 2,
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    const t = Date.now() * 0.001;
+
+    particles.forEach(p => {
+      p.x += p.dx;
+      p.y += p.dy;
+
+      if (p.x < -10) p.x = w + 10;
+      if (p.x > w + 10) p.x = -10;
+      if (p.y < -10) p.y = h + 10;
+      if (p.y > h + 10) p.y = -10;
+
+      const flicker = Math.sin(t + p.phase) * 0.3 + 0.7;
+      const a = p.opacity * flicker;
+
+      ctx.beginPath();
+      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+      grad.addColorStop(0, `rgba(201, 168, 76, ${a})`);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// === REMINDER SYSTEM ===
+let reminderInterval = null;
+let reminderEnabled = false;
+let selectedMinutes = 30;
+let promptIndex = 0;
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let shuffledPrompts = shuffleArray(prompts);
+
+function getNextPrompt() {
+  if (promptIndex >= shuffledPrompts.length) {
+    shuffledPrompts = shuffleArray(prompts);
+    promptIndex = 0;
+  }
+  return shuffledPrompts[promptIndex++];
+}
+
+async function sendNotification(text) {
+  // Clean text for notification (remove markdown-like formatting)
+  const cleanText = text.replace(/_([^_]+)_/g, '$1').replace(/\n/g, ' · ');
+
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('🧘 觉察时刻', {
+      body: cleanText,
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">🧘</text></svg>',
+      silent: false,
+    });
+  }
+
+  // Also show in-app toast
+  showToast(text);
+}
+
+function showToast(text) {
+  const toast = document.getElementById('notification-toast');
+  toast.innerHTML = text.replace(/\n/g, '<br>').replace(/_([^_]+)_/g, '<em style="color:var(--incense-dim)">$1</em>');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 8000);
+}
+
+async function getLLMPrompt() {
+  const apiKey = localStorage.getItem('buda-api-key');
+  if (!apiKey) return getNextPrompt();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        messages: [{
+          role: 'user',
+          content: '请给我一条觉察提醒。'
+        }],
+        system: `你是 Max 的修行助手。Max 正在学习心经和金刚经，修行觉察-转念-布施。
+
+规则：
+1. 随机选择风格：经典引导 / 现代正念 / 禅宗公案 / 身体觉察
+2. 格式：
+🧘 觉察时刻
+[1-2句引导，50字以内]
+💡 [实用技巧]
+_[金句]_
+3. 简短（80字以内），实用，中文为主，温和不说教`
+      })
+    });
+
+    if (!response.ok) throw new Error('API error');
+    const data = await response.json();
+    return data.content[0].text;
+  } catch (e) {
+    console.warn('LLM fallback to local prompts:', e.message);
+    return getNextPrompt();
+  }
+}
+
+async function triggerReminder() {
+  const text = await getLLMPrompt();
+  sendNotification(text);
+}
+
+function startReminders() {
+  stopReminders();
+  const ms = selectedMinutes * 60 * 1000;
+  reminderInterval = setInterval(triggerReminder, ms);
+}
+
+function stopReminders() {
+  if (reminderInterval) {
+    clearInterval(reminderInterval);
+    reminderInterval = null;
+  }
+}
+
+// === TOGGLE & CONTROLS ===
+function initControls() {
+  const toggle = document.getElementById('reminder-toggle');
+  const intervalSel = document.getElementById('interval-selector');
+  const intervalBtns = document.querySelectorAll('.interval-btn');
+
+  toggle.addEventListener('click', async () => {
+    reminderEnabled = !reminderEnabled;
+    toggle.classList.toggle('active', reminderEnabled);
+    toggle.setAttribute('aria-checked', reminderEnabled);
+    intervalSel.classList.toggle('enabled', reminderEnabled);
+
+    if (reminderEnabled) {
+      if ('Notification' in window && Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+      startReminders();
+      // Show first reminder after 3 seconds as preview
+      setTimeout(triggerReminder, 3000);
+    } else {
+      stopReminders();
+    }
+  });
+
+  // Keyboard support
+  toggle.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle.click();
+    }
+  });
+
+  intervalBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      intervalBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedMinutes = parseInt(btn.dataset.minutes);
+      if (reminderEnabled) startReminders();
+    });
+  });
+}
+
+// === SETTINGS MODAL ===
+function initSettings() {
+  const overlay = document.getElementById('settings-overlay');
+  const settingsBtn = document.getElementById('settings-btn');
+  const cancelBtn = document.getElementById('modal-cancel');
+  const clearBtn = document.getElementById('modal-clear');
+  const saveBtn = document.getElementById('modal-save');
+  const input = document.getElementById('api-key-input');
+  const statusEl = document.getElementById('llm-status');
+  const statusText = document.getElementById('llm-status-text');
+
+  function updateStatus() {
+    const key = localStorage.getItem('buda-api-key');
+    if (key) {
+      statusEl.classList.add('connected');
+      statusText.textContent = 'API Key 已保存 · Claude Sonnet';
+    } else {
+      statusEl.classList.remove('connected');
+      statusText.textContent = '未连接 · 使用本地提示库';
+    }
+  }
+
+  settingsBtn.addEventListener('click', () => {
+    const key = localStorage.getItem('buda-api-key');
+    input.value = key || '';
+    updateStatus();
+    overlay.classList.add('visible');
+  });
+
+  function closeModal() {
+    overlay.classList.remove('visible');
+  }
+
+  cancelBtn.addEventListener('click', closeModal);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  saveBtn.addEventListener('click', () => {
+    const val = input.value.trim();
+    if (val) {
+      localStorage.setItem('buda-api-key', val);
+    }
+    updateStatus();
+    closeModal();
+  });
+
+  clearBtn.addEventListener('click', () => {
+    localStorage.removeItem('buda-api-key');
+    input.value = '';
+    updateStatus();
+  });
+
+  updateStatus();
+}
+
+// === INIT ===
+document.addEventListener('DOMContentLoaded', () => {
+  initParticles();
+  initCarousel();
+  initControls();
+  initSettings();
+});
+</script>
+</body>
+</html>
